@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Demo</title>
+    <link rel="shortcut icon" href="data:image/x-icon;" type="image/x-icon" />
+    <script src="lib/jimp-0.2.27.min.js"></script>
+  </head>
+  <body>
+    <h2>Original</h2>
+    <div id="original"><img src="./img/image.jpg" alt="image" width="1280" height="720"></div>
+
+    <h2>Compressed</h2>
+    <div id="compressed"></div>
+
+    <script>
+      const MAX_SIZE = 1448;
+      const MAX_FILE_SIZE = 310 * 1024;
+      const COMPRESSION = 80;
+
+      // https://github.com/oliver-moran/jimp
+      Jimp.read('./img/image.jpg').then((image) => {
+        if ((image.bitmap.width > MAX_SIZE) || (image.bitmap.height > MAX_SIZE)) {
+          image.scaleToFit(MAX_SIZE, MAX_SIZE);
+        }
+
+        if (image.bitmap.data.length > MAX_FILE_SIZE) {
+          image.quality(COMPRESSION);
+        }
+
+        return image.getBuffer(Jimp.AUTO, (error, data) => {
+          const blob = new Blob([data], {'type': 'image/png'});
+          const url = URL.createObjectURL(blob);
+
+          const compressedImage = document.createElement('img');
+          compressedImage.src = url;
+          document.getElementById('compressed').appendChild(compressedImage);
+        });
+      });
+    </script>
+  </body>
+</html>
